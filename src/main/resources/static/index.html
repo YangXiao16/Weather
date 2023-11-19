@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的天气</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        #weather {
+            margin-top: 20px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+        }
+        .weather-item {
+            margin-bottom: 10px;
+            font-size: 1.2em;
+            color: #666;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        input[type="text"] {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+<h1>我的天气</h1>
+<input type="text" id="city" placeholder="请输入城市名称">
+<button onclick="getWeather()">查询</button>
+<div id="weather"></div>
+<!--http://localhost:8080/weather/-->
+<script>
+    function getWeather() {
+        var city = document.getElementById('city').value;
+        fetch('http://localhost:8080/weather/' + city)
+            .then(response => response.text())
+            .then(data => {
+                var parser = new DOMParser();
+                var xmlDoc = parser.parseFromString(data, "text/xml");
+
+                var weatherStrings = xmlDoc.getElementsByTagName('string');
+                var weatherInfo = '';
+
+                // Only display the province, city, and weather condition
+                weatherInfo += '<div class="weather-item">' + weatherStrings[0].textContent + '</div>'; // Province
+                weatherInfo += '<div class="weather-item">' + weatherStrings[1].textContent + '</div>'; // City
+                weatherInfo += '<div class="weather-item">' + weatherStrings[10].textContent + '</div>'; // Weather condition
+
+                document.getElementById('weather').innerHTML = weatherInfo;
+            })
+            .catch(error => console.error('Error:', error));
+    }
+</script>
+</body>
+</html>
